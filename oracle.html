@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#0a0714">
+<title>THE ORACLE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-0:#0a0714;
+    --bg-1:#150d26;
+    --bg-2:#1e1338;
+    --violet:#8b5cf6;
+    --violet-soft:#a78bfa;
+    --gold:#f0cf7a;
+    --ink:#f2edff;
+    --ink-dim:#b7abda;
+    --line:rgba(167,139,250,0.22);
+    --font-display:'Cinzel', serif;
+    --font-body:'Space Grotesk', sans-serif;
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--bg-0);
+    color:var(--ink);
+    font-family:var(--font-body);
+    overflow-x:hidden;
+  }
+
+  body{
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139,92,246,0.25), transparent 60%),
+      radial-gradient(ellipse 60% 40% at 15% 110%, rgba(139,92,246,0.15), transparent 60%),
+      var(--bg-0);
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  #stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  .star{
+    position:absolute; border-radius:50%;
+    background:var(--violet-soft);
+    opacity:0.5;
+    animation:twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:0.15; transform:scale(0.8);}
+    50%{opacity:0.85; transform:scale(1.15);}
+  }
+
+  .app{
+    position:relative; z-index:1;
+    width:100%; max-width:460px;
+    min-height:100dvh;
+    padding:32px 24px 44px;
+    display:flex; flex-direction:column;
+  }
+
+  .screen{
+    display:none;
+    flex:1;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    gap:26px;
+    animation:fadeIn 0.6s ease;
+  }
+  .screen.active{ display:flex; }
+
+  @keyframes fadeIn{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---- The Orb (signature element) ---- */
+  .orb-wrap{
+    position:relative;
+    width:172px; height:172px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .orb-ring{
+    position:absolute; inset:0;
+    border-radius:50%;
+    border:1px solid var(--line);
+  }
+  .orb-ring.r2{ inset:-22px; opacity:0.6; animation:spin 22s linear infinite; }
+  .orb-ring.r3{ inset:-44px; opacity:0.35; animation:spin 34s linear infinite reverse; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .orb-core{
+    width:112px; height:112px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #d8c4ff 0%, var(--violet) 42%, #3a1e6e 78%, #150a2c 100%);
+    box-shadow:
+      0 0 30px 6px rgba(139,92,246,0.55),
+      0 0 70px 18px rgba(139,92,246,0.28),
+      inset 0 0 24px rgba(255,255,255,0.15);
+    animation:pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{ transform:scale(1); filter:brightness(1); }
+    50%{ transform:scale(1.05); filter:brightness(1.18); }
+  }
+  .orb-core.thinking{ animation:pulse 0.9s ease-in-out infinite; }
+
+  /* ---- Type ---- */
+  .eyebrow{
+    font-family:var(--font-body);
+    font-size:11px;
+    letter-spacing:0.32em;
+    text-transform:uppercase;
+    color:var(--violet-soft);
+  }
+  h1.title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(30px, 9vw, 40px);
+    letter-spacing:0.05em;
+    margin:0;
+    background:linear-gradient(180deg, #fff, var(--violet-soft));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+  }
+  p.lede{
+    font-size:15.5px;
+    line-height:1.55;
+    color:var(--ink-dim);
+    max-width:320px;
+    margin:0;
+  }
+
+  /* ---- Buttons ---- */
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:16px;
+    letter-spacing:0.02em;
+    padding:17px 30px;
+    border-radius:14px;
+    min-width:240px;
+    min-height:54px;
+    color:var(--bg-0);
+    background:linear-gradient(135deg, #c9b6ff, var(--violet));
+    box-shadow:0 0 24px rgba(139,92,246,0.45), 0 6px 20px rgba(0,0,0,0.35);
+    transition:transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn:active{ transform:scale(0.96); box-shadow:0 0 14px rgba(139,92,246,0.4); }
+
+  .btn-ghost{
+    background:transparent;
+    color:var(--ink);
+    border:1px solid var(--line);
+    box-shadow:none;
+    min-width:170px;
+  }
+  .btn-ghost:active{ background:rgba(139,92,246,0.12); }
+
+  .btn-row{ display:flex; gap:14px; flex-wrap:wrap; justify-content:center; }
+
+  .link-quiet{
+    background:none; border:none; cursor:pointer;
+    font-family:var(--font-body);
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-dim);
+    padding:10px;
+  }
+
+  /* ---- Loading screen ---- */
+  .loading-msg{
+    font-family:var(--font-body);
+    font-size:15px;
+    color:var(--violet-soft);
+    min-height:22px;
+  }
+  .bar-track{
+    width:220px; height:6px; border-radius:6px;
+    background:rgba(139,92,246,0.15);
+    overflow:hidden;
+    border:1px solid var(--line);
+  }
+  .bar-fill{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--violet), var(--gold));
+    border-radius:6px;
+    transition:width 0.15s linear;
+  }
+
+  /* ---- Fate card ---- */
+  .card{
+    width:100%;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:26px 22px;
+    background:linear-gradient(180deg, rgba(139,92,246,0.10), rgba(21,13,38,0.6));
+    backdrop-filter:blur(6px);
+  }
+  .card-label{
+    font-family:var(--font-display);
+    font-size:12px;
+    letter-spacing:0.24em;
+    text-transform:uppercase;
+    color:var(--gold);
+    margin-bottom:10px;
+    display:block;
+  }
+  .fate-text{
+    font-family:var(--font-display);
+    font-size:clamp(19px, 5.6vw, 23px);
+    line-height:1.45;
+    color:var(--ink);
+    font-weight:600;
+  }
+
+  .song-block{ display:flex; flex-direction:column; align-items:center; gap:4px; }
+  .song-title{ font-family:var(--font-display); font-size:20px; font-weight:700; }
+  .song-artist{ font-size:14px; color:var(--ink-dim); }
+
+  .verdict-msg{
+    font-family:var(--font-display);
+    font-size:19px;
+    color:var(--gold);
+  }
+
+  footer.tag{
+    text-align:center;
+    font-size:11px;
+    letter-spacing:0.15em;
+    text-transform:uppercase;
+    color:rgba(183,171,218,0.4);
+    padding-top:22px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<div class="app">
+
+  <!-- SCREEN 1: INTRO -->
+  <section class="screen active" id="screen-intro">
+    <div class="orb-wrap">
+      <div class="orb-ring r2"></div>
+      <div class="orb-ring r3"></div>
+      <div class="orb-core"></div>
+    </div>
+    <div>
+      <div class="eyebrow">The Oracle</div>
+      <h1 class="title">A decision has<br>already been made.</h1>
+    </div>
+    <p class="lede">Are you ready to know your fate?</p>
+    <button class="btn" onclick="beginConsultation()">Reveal My Fate</button>
+  </section>
+
+  <!-- SCREEN 2: LOADING -->
+  <section class="screen" id="screen-loading">
+    <div class="orb-wrap">
+      <div class="orb-ring r2"></div>
+      <div class="orb-ring r3"></div>
+      <div class="orb-core thinking"></div>
+    </div>
+    <div class="loading-msg" id="loading-msg">Consulting the universe…</div>
+    <div class="bar-track"><div class="bar-fill" id="bar-fill"></div></div>
+  </section>
+
+  <!-- SCREEN 3: FATE -->
+  <section class="screen" id="screen-fate">
+    <div class="eyebrow">Your fate</div>
+    <div class="card">
+      <span class="card-label">Today's Fate</span>
+      <div class="fate-text" id="fate-text">—</div>
+    </div>
+    <button class="btn" onclick="showSong()">What's My Song?</button>
+  </section>
+
+  <!-- SCREEN 4: SONG -->
+  <section class="screen" id="screen-song">
+    <div class="eyebrow">The Oracle Has Also Chosen</div>
+    <div class="card song-block">
+      <span class="card-label">Your Song</span>
+      <div class="song-title" id="song-title">—</div>
+      <div class="song-artist" id="song-artist">—</div>
+    </div>
+    <a class="btn" id="play-link" href="#" target="_blank" rel="noopener">▶ Play This Song</a>
+    <button class="btn btn-ghost" onclick="showVerdict()">Continue</button>
+  </section>
+
+  <!-- SCREEN 5: VERDICT QUESTION -->
+  <section class="screen" id="screen-question">
+    <div class="orb-wrap">
+      <div class="orb-ring r2"></div>
+      <div class="orb-core"></div>
+    </div>
+    <h1 class="title" style="font-size:24px;">Was the Oracle<br>correct?</h1>
+    <div class="btn-row">
+      <button class="btn" onclick="showVerdictResult(true)">Yes 😳</button>
+      <button class="btn btn-ghost" onclick="showVerdictResult(false)">Absolutely Not 💀</button>
+    </div>
+  </section>
+
+  <!-- SCREEN 6: VERDICT RESULT -->
+  <section class="screen" id="screen-verdict">
+    <div class="orb-wrap">
+      <div class="orb-ring r2"></div>
+      <div class="orb-ring r3"></div>
+      <div class="orb-core"></div>
+    </div>
+    <div class="verdict-msg" id="verdict-text">—</div>
+    <button class="link-quiet" onclick="consultAgain()">⚡ Consult Again</button>
+  </section>
+
+  <footer class="tag">tap · reveal · repeat</footer>
+</div>
+
+<script>
+/* ---------------- Starfield ---------------- */
+(function(){
+  const field = document.getElementById('stars');
+  const count = 46;
+  for(let i=0;i<count;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    const size = Math.random()*2.2+1;
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = Math.random()*100+'%';
+    s.style.top = Math.random()*100+'%';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    field.appendChild(s);
+  }
+})();
+
+/* ---------------- Data ---------------- */
+const FATES = [
+  "You will say \"I'm not hungry\" and then eat someone else's food.",
+  "You will spend money on something you absolutely did not need.",
+  "Something unexpectedly good is coming your way today.",
+  "Do not make important decisions today.",
+  "Someone you haven't spoken to in a while will cross your mind today.",
+  "You will lose an argument you were technically winning.",
+  "A stranger will unknowingly improve your entire day.",
+  "You will open the fridge more than five times looking for the same nothing.",
+  "Today, your patience will be tested by something extremely minor.",
+  "You will start a task with full motivation and abandon it within the hour.",
+  "Someone is going to text you first for once.",
+  "You will laugh at something that isn't actually that funny.",
+  "A small risk today pays off bigger than expected.",
+  "You will forget why you walked into a room, twice.",
+  "Your next purchase will be regretted within 48 hours.",
+  "Good news arrives when you least expect it.",
+  "You will procrastinate on the one thing you promised yourself you'd finally do.",
+  "Someone will compliment you and you won't know how to respond.",
+  "You are about to have an unreasonably good hair day.",
+  "A conversation today will change your mind about something small.",
+  "You will overthink a text message for far too long.",
+  "Today is not the day to check your bank account.",
+  "You will find something you lost weeks ago in the most obvious place.",
+  "Your snack cravings today cannot be reasoned with.",
+  "An old song will get stuck in your head at the worst possible moment.",
+  "You will say \"one more episode\" at least three times.",
+  "A plan will change last minute, and it will be fine.",
+  "You are going to make a questionable decision involving food delivery.",
+  "Someone is thinking about asking you for a favor. Brace yourself.",
+  "You will feel unreasonably proud of a very small accomplishment.",
+  "Today rewards the version of you that just starts, imperfectly.",
+  "You will almost trip on absolutely nothing.",
+  "A message you've been avoiding will finally get answered.",
+  "The universe is aware you left something on 'read.'",
+  "You will win a small, meaningless victory and celebrate like it's huge.",
+  "Trust your gut today, even when it makes no logical sense.",
+  "You are going to reorganize something that did not need reorganizing.",
+  "A nap today will be more productive than anything else you do.",
+  "Your patience for small talk is running dangerously low today.",
+  "Something you forgot about will resurface at exactly the right time.",
+  "You will be legally required to buy a friend a snack.",
+  "Do not trust your own judgment near the snack aisle today.",
+  "You are one impulsive decision away from a great story."
+];
+
+const SONGS = [
+  { title:"Blinding Lights", artist:"The Weeknd", url:"https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b" },
+  { title:"As It Was", artist:"Harry Styles", url:"https://open.spotify.com/track/4Dvkj6JhhA12EX05fT7y2e" },
+  { title:"Flowers", artist:"Miley Cyrus", url:"https://open.spotify.com/track/7DSAEUvxU8FajXtRloy8M0" },
+  { title:"Levitating", artist:"Dua Lipa", url:"https://open.spotify.com/track/463CkQjx2Zk1yXoBuierM9" },
+  { title:"good 4 u", artist:"Olivia Rodrigo", url:"https://open.spotify.com/track/4ZtFanR9U6ndgddUvNcjcG" },
+  { title:"Circles", artist:"Post Malone", url:"https://open.spotify.com/track/21jGcNKet2qwijlDFuPiPb" },
+  { title:"Sunflower", artist:"Post Malone, Swae Lee", url:"https://open.spotify.com/track/3KkXRkHbMCARz0aVfEt68P" },
+  { title:"Kill Bill", artist:"SZA", url:"https://open.spotify.com/track/3OHfY25tqY28d16oZczHc8" },
+  { title:"Cruel Summer", artist:"Taylor Swift", url:"https://open.spotify.com/track/1BxfuPKGuaTgP7aM0Bbdwr" },
+  { title:"Espresso", artist:"Sabrina Carpenter", url:"https://open.spotify.com/track/2qSkIjg1o9h3YT9RAgYN75" },
+  { title:"Blinding Lights (Remix)", artist:"The Weeknd", url:"https://open.spotify.com/track/0VjIjW4GlUZAMYd2vXMi3b" },
+  { title:"Watermelon Sugar", artist:"Harry Styles", url:"https://open.spotify.com/track/6UelLqGlWMcVH1E5c4H7lY" },
+  { title:"Say So", artist:"Doja Cat", url:"https://open.spotify.com/track/3Dv1eDb0MEgF93GpLXlucZ" },
+  { title:"Peaches", artist:"Justin Bieber", url:"https://open.spotify.com/track/4iJyoBOLtHqaGxP12qzhQI" },
+  { title:"Anti-Hero", artist:"Taylor Swift", url:"https://open.spotify.com/track/0V3wPSX9ygBnCm8psDIegu" },
+  { title:"Unholy", artist:"Sam Smith, Kim Petras", url:"https://open.spotify.com/track/3nqQXoyQOWXiESFLlDF1hG" },
+  { title:"Vampire", artist:"Olivia Rodrigo", url:"https://open.spotify.com/track/1kuGVB7EU95pJHi0h7Dr96" },
+  { title:"Paint The Town Red", artist:"Doja Cat", url:"https://open.spotify.com/track/3xkHsmpQCTz7g0hAOWH4dR" },
+  { title:"Golden Hour", artist:"JVKE", url:"https://open.spotify.com/track/17NIm2WQ5wONO0BXe4pDCC" },
+  { title:"Snooze", artist:"SZA", url:"https://open.spotify.com/track/28oes46e6IHAeZzsIjkzzM" }
+];
+
+/* ---------------- State ---------------- */
+let consultCount = 0;
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function beginConsultation(){
+  showScreen('screen-loading');
+  runLoadingSequence();
+}
+
+function runLoadingSequence(){
+  const messages = [
+    "Checking your vibes…",
+    "Consulting the universe…",
+    "Calculating questionable decisions…",
+    "Aligning the stars…"
+  ];
+  const msgEl = document.getElementById('loading-msg');
+  const fillEl = document.getElementById('bar-fill');
+  let step = 0;
+  msgEl.textContent = messages[0];
+  fillEl.style.width = '0%';
+
+  const msgInterval = setInterval(()=>{
+    step++;
+    if(step < messages.length){
+      msgEl.textContent = messages[step];
+    }
+  }, 650);
+
+  let pct = 0;
+  const barInterval = setInterval(()=>{
+    pct += Math.random()*14 + 6;
+    if(pct >= 100){
+      pct = 100;
+      fillEl.style.width = pct + '%';
+      clearInterval(barInterval);
+      clearInterval(msgInterval);
+      setTimeout(revealFate, 350);
+    } else {
+      fillEl.style.width = pct + '%';
+    }
+  }, 220);
+}
+
+function revealFate(){
+  const fate = FATES[Math.floor(Math.random()*FATES.length)];
+  document.getElementById('fate-text').textContent = fate;
+  showScreen('screen-fate');
+}
+
+function showSong(){
+  const song = SONGS[Math.floor(Math.random()*SONGS.length)];
+  document.getElementById('song-title').textContent = song.title;
+  document.getElementById('song-artist').textContent = song.artist;
+  document.getElementById('play-link').href = song.url;
+  showScreen('screen-song');
+}
+
+function showVerdict(){
+  showScreen('screen-question');
+}
+
+function showVerdictResult(correct){
+  document.getElementById('verdict-text').textContent = correct
+    ? "🔮 The Oracle knew."
+    : "🤨 Interesting… The Oracle disagrees.";
+  showScreen('screen-verdict');
+}
+
+function consultAgain(){
+  consultCount++;
+  if(consultCount === 1){
+    const verdictText = document.getElementById('verdict-text');
+    showScreen('screen-verdict');
+    verdictText.textContent = "You cannot escape your fate.";
+    setTimeout(()=>{
+      verdictText.textContent = "Fine. One more time. 😂";
+      setTimeout(()=>{ showScreen('screen-intro'); }, 1200);
+    }, 1400);
+  } else {
+    showScreen('screen-intro');
+  }
+}
+</script>
+
+</body>
+</html>
